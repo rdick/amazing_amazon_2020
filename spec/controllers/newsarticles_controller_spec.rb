@@ -107,5 +107,66 @@ RSpec.describe NewsarticlesController, type: :controller do
      expect(assigns(:newsarticles)).to eq([newsarticle_2, newsarticle_1])
    end
  end
-
+describe "#edit" do
+    it "renders the edit template" do
+      newsarticle = FactoryBot.create(:newsarticle)
+      get :edit, params: { id: newsarticle.id }
+      expect(response).to render_template :edit
+    end
+    it "sets an instance variable based on the article id that is passed" do
+      newsarticle = FactoryBot.create(:newsarticle)
+      get :edit, params: { id: newsarticle.id }
+      expect(assigns(:newsarticle)).to eq(newsarticle)
+    end
+  end
+  describe "#update" do
+    before do
+      @newsarticle = FactoryBot.create(:newsarticle)
+    end
+    context 'with valid parameters' do
+      it "updates the news article record with new attributes" do
+        new_title = "#{@newsarticle.title} Plus Changes!"
+        patch :update, params: {id: @newsarticle.id, newsarticle: {title: new_title}}
+        expect(@newsarticle.reload.title).to eq(new_title) 
+      end
+      it "redirect to the news article show page" do
+        new_title = "#{@newsarticle.title} plus changes!"
+        patch :update, params: {id: @newsarticle.id, newsarticle: {title: new_title}}
+        expect(response).to redirect_to(@newsarticle)
+      end
+    end
+    context 'with invalid parameters' do
+      def invalid_request
+        patch :update, params: {id: @newsarticle.id, newsarticle: {title: nil}}
+      end
+      it "doesn't update the news article with new attributes" do
+        expect { invalid_request }.not_to change { @newsarticle.reload.title }
+      end
+      it "renders the edit template" do
+        invalid_request
+        expect(response).to render_template(:edit)
+      end
+    end
+  end
 end
+
+
+
+    # newsarticle = FactoryBot.create(:job_post)
+    #     get(:edit, params: { id: job_post.id })
+    #     expect(assigns(:job_post)).to eq(job_post)
+
+    #     newsarticle = FactoryBot.create(:newsarticle)
+    #     get(:edit, params: {id: newsarticle.id })
+    #     expect(response).to render_template(:show)
+
+    #     expect(response).to render_template(:index)
+        
+    #     newsarticle = FactoryBot.create(:newsarticle)
+    #  get :show, params: { id: newsarticle.id }
+    #  expect(assigns(:newsarticle)).to eq(newsarticle)
+
+    #  expect(flash[:alert]).to be
+    #  expect(response).to(redirect_to(newsarticle_path(Newsarticle.last)))
+
+    #  expect(count_after).to(eq(count_before + 1))
